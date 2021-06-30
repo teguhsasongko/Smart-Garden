@@ -7,7 +7,7 @@ WiFiClient wifiClient;
 
 //BUAT WIFINYA
 const char* ssid = "localhost";
-const char* password = "27BF7F16";
+const char* password = "##########";
 int status = WL_IDLE_STATUS;
 //BUAT HOSTNYA
 const char* serverName = "http://127.0.0.1/sensor/send.php";
