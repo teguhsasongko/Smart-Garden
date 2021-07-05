@@ -68,7 +68,7 @@
             Level Air
             </div>
             <div class="card-body">
-            <h1><span id="ceklevelair">0</span> CM</h1>
+            <h1><span id="ceklevelair">0</span></h1>
             </div>
         </div>
         <!-- akhir hasil level air -->   
