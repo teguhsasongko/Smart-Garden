@@ -6,17 +6,19 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 WiFiClient wifiClient;
 
 //BUAT WIFINYA
-const char* ssid = "Ellond";
-const char* password = "kayapwbolt";
+const char* ssid = "localhost";
+const char* password = "";
 int status = WL_IDLE_STATUS;
 //BUAT HOSTNYA
-const char* serverName = "http://192.168.100.225/sensor/send.php";
+const char* serverName = "http://192.168.1.9/sensor/send.php";
                         
 const int relay = D5;      
 const int sensorPin = A0;
 int nilai;
 int buatRelay;
+int buatAir;
 String stRelay;
+String stAir;
 const int trigPin = D6;
 const int echoPin = D7;
 const int buzzer = D4;
@@ -36,7 +38,6 @@ void setup() {
   lcd.print(".");
   //KALO BISA KONEK
   lcd.print("BERHASIL KONEKSI");
-  Serial.println("BERHASIL KONEKSI");
   }
   pinMode(sensorPin, INPUT);
   pinMode(relay, OUTPUT);
@@ -94,42 +95,40 @@ void loop() {
     digitalWrite(relay, HIGH);
     stRelay = "OFF";
   } 
-    if (distance < 5)
+    if (distance > 16)
     {
     lcd.setCursor(0,0);
-    lcd.print("Distance: ");
-    lcd.print(distance);
-    lcd.print(" cm");
+    lcd.print("Sisa Air Kurang");
     lcd.setCursor(0,1);
-    lcd.print("Air dikit WOY");
+    lcd.print("Dari 6 cm");
     digitalWrite(buzzer, HIGH);
     delay (1000);
+    stAir = "Air Tersisa Kurang dari 6 cm";
 }
-    else if(distance >= 6 )
+    else if(distance > 6 && distance < 16)
 {
     lcd.setCursor(0,0);
-    lcd.print("Distance: ");
-    lcd.print(distance);
-    lcd.print(" cm");
+    lcd.print("Sisa Air");
     lcd.setCursor(0,1);
-    lcd.print("Air masih banyak");
+    lcd.print("Masih Cukup");
     digitalWrite(buzzer, LOW);
-    delay (100);
+    delay (1000);
+    stAir = "Air Tersisa Setengah";
 }
-
-////kirim data ke server
-//  WiFiClient client;
-//  //inisialisasi port 80
-//  const int httpPort = 80;
-//  if( !client.connect(server, httpPort)){
-//    lcd.print("Koneksi Gagal");
-//    Serial.println("Koneksi Gagal");
-//    return;
-//  }
-
+    else if(distance < 6 )
+{
+    lcd.setCursor(0,0);
+    lcd.print(" Air");
+    lcd.setCursor(0,1);
+    lcd.print("Masih Penuh");
+    digitalWrite(buzzer, LOW);
+    delay (1000);
+    stAir = "Air Masih Penuh";
+}
 //Check WiFi connection status
   if(WiFi.status()== WL_CONNECTED){
     Serial.println(stRelay);
+    Serial.println(stAir);
     HTTPClient http;
     // Your Domain name with URL path or IP address with path
     http.begin(wifiClient,serverName);
@@ -138,7 +137,7 @@ void loop() {
     http.addHeader("Content-Type", "application/x-www-form-urlencoded");
 
     // Prepare your HTTP POST request data
-    String httpRequestData = "kelembapan=" + String(nilai) + "&waterlevel=" + String(distance) +"&menyiram=" + stRelay +"";
+    String httpRequestData = "kelembapan=" + String(nilai) + "&waterlevel=" + stAir +"&menyiram=" + stRelay +"";
 
     Serial.print("httpRequestData: ");
     Serial.println(httpRequestData);
